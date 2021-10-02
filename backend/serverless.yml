@@ -25,7 +25,6 @@ provider:
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     ATTACHMENT_S3_BUCKET: udacity-asad-serverless-todo-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    AUTH_0_SECRET: uuGEcl3ia5wdw7ANxGrmdw2y5Gci7yKBZ8ZpPvMzyESmJafT7EIdivOvMXwU0TxQ
 
   logs:
     # Enable API Gateway logs
@@ -39,7 +38,6 @@ provider:
             - xray:PutTelemetryRecords
             - xray:PutTraceSegments
           Resource: "*"
-
 
 functions:
 
