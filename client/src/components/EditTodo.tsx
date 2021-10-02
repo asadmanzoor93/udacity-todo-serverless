@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Form, Button } from 'semantic-ui-react'
+import {Button, Form} from 'semantic-ui-react'
 import Auth from '../auth/Auth'
-import { getUploadUrl, uploadFile } from '../api/todos-api'
+import {getUploadUrl, uploadFile} from '../api/todos-api'
 
 enum UploadState {
   NoUpload,
@@ -23,10 +23,8 @@ interface EditTodoState {
   uploadState: UploadState
 }
 
-export class EditTodo extends React.PureComponent<
-  EditTodoProps,
-  EditTodoState
-> {
+export class EditTodo extends React.PureComponent<EditTodoProps,
+  EditTodoState> {
   state: EditTodoState = {
     file: undefined,
     uploadState: UploadState.NoUpload
@@ -58,7 +56,7 @@ export class EditTodo extends React.PureComponent<
 
       alert('File was uploaded!')
     } catch (e) {
-      alert('Could not upload a file: ' + e.message)
+      alert('Could not upload a file: ' + e)
     } finally {
       this.setUploadState(UploadState.NoUpload)
     }

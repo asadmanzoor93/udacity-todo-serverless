@@ -50,6 +50,7 @@ export const handler = async (
 
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
+  logger.info('Authorizing TOKEN: '+ token + ' :: AUTH_0_SECRET: ' + AUTH_0_SECRET)
   return verify(token, AUTH_0_SECRET) as JwtPayload
 }
 

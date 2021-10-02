@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk'
-import {UpdateTodoRequest} from "../requests/UpdateTodoRequest";
+import {UpdateTodoRequest} from "../../requests/UpdateTodoRequest";
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE

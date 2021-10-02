@@ -12,6 +12,5 @@ export async function getTodosForUser(userId: string) {
         },
         ScanIndexForward: false
     }).promise()
-
     return result.Items
 }
