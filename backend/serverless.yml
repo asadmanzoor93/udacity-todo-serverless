@@ -5,6 +5,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
+  - serverless-reqvalidator-plugin
 
 provider:
   name: aws
@@ -23,7 +24,7 @@ provider:
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: udacity-asad-serverless-todo-images-${self:provider.stage}
+    # ATTACHMENT_S3_BUCKET: udacity-asad-serverless-todo-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   logs:
@@ -67,8 +68,9 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          reqValidatorName: RequestBodyValidator
           request:
-            schemas:
+            schema:
               application/json: ${file(models/create-todo-model.json)}
 
     iamRoleStatements:
@@ -85,6 +87,10 @@ functions:
           path: todos/{todoId}
           cors: true
           authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          request:
+            schema:
+              application/json: ${file(models/update-todo-model.json)}
 
     iamRoleStatements:
       - Effect: Allow
@@ -116,16 +122,16 @@ functions:
           cors: true
           authorizer: Auth
 
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-          - s3:GetObject
-        Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
+    # iamRoleStatements:
+    #   - Effect: Allow
+    #     Action:
+    #       - dynamodb:UpdateItem
+    #     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    #   - Effect: Allow
+    #     Action:
+    #       - s3:PutObject
+    #       - s3:GetObject
+    #     Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
 
 resources:
   Resources:
@@ -137,7 +143,7 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
-        ValidateRequestParameters: false
+        ValidateRequestParameters: true
 
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
@@ -167,38 +173,38 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
 
-    # Complete the bucket properties below.
-    AttachmentsBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
-        CorsConfiguration:
-          CorsRules:
-            - AllowedOrigins:
-                - "*"
-              AllowedHeaders:
-                - "*"
-              AllowedMethods:
-                - GET
-                - DELETE
-                - PUT
-                - POST
-                - HEAD
-              MaxAge: 5000
+    # # Complete the bucket properties below.
+    # AttachmentsBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
+    #     CorsConfiguration:
+    #       CorsRules:
+    #         - AllowedOrigins:
+    #             - "*"
+    #           AllowedHeaders:
+    #             - "*"
+    #           AllowedMethods:
+    #             - GET
+    #             - DELETE
+    #             - PUT
+    #             - POST
+    #             - HEAD
+    #           MaxAge: 5000
 
-    # Complete the policy below and attach it to the bucket defined above
-    BucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        PolicyDocument:
-          Id: MyPolicy
-          Version: "2012-10-17"
-          Statement:
-            - Sid: PublicReadForGetBucketObjects
-              Effect: Allow
-              Principal: "*"
-              Action:
-                - s3:GetObject
-                - s3:PutObject
-              Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
-        Bucket: !Ref AttachmentsBucket
+    # # Complete the policy below and attach it to the bucket defined above
+    # BucketPolicy:
+    #   Type: AWS::S3::BucketPolicy
+    #   Properties:
+    #     PolicyDocument:
+    #       Id: MyPolicy
+    #       Version: "2012-10-17"
+    #       Statement:
+    #         - Sid: PublicReadForGetBucketObjects
+    #           Effect: Allow
+    #           Principal: "*"
+    #           Action:
+    #             - s3:GetObject
+    #             - s3:PutObject
+    #           Resource: "arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*"
+    #     Bucket: !Ref AttachmentsBucket
